@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Swashbuckle.AspNetCore.Swagger;
 
-namespace Hack.api.OperationFilters
+namespace Hack.Api.OperationFilters
 {
     public class AuthorizationHeaderParameterOperationFilter : IOperationFilter
     {
