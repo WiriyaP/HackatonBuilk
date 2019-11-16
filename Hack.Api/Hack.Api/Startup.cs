@@ -2,12 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Hack.api.OperationFilters;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Swashbuckle.AspNetCore.Swagger;
 
 namespace Hack.Api
 {
@@ -29,6 +31,13 @@ namespace Hack.Api
 
             // Add S3 to the ASP.NET Core dependency injection framework.
             services.AddAWSService<Amazon.S3.IAmazonS3>();
+
+            // Add swagger interactive documentation
+            services.AddSwaggerGen(config =>
+            {
+                config.SwaggerDoc("v1", new Info { Title = "GHB API Gateway", Version = "v1" });
+                config.OperationFilter<AuthorizationHeaderParameterOperationFilter>();
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline
@@ -45,6 +54,18 @@ namespace Hack.Api
 
             app.UseHttpsRedirection();
             app.UseMvc();
+            app.UseSwagger();
+            app.UseSwaggerUI(config =>
+            {
+                string Url = "/swagger/v1/swagger.json";
+                if (env.IsProduction())
+                {
+                    Url = "/Prod/swagger/v1/swagger.json";
+                }
+                config.SwaggerEndpoint(Url, "BankGateway API V1");
+            });
+
+            app.UseCors("AllowAll");
         }
     }
 }
